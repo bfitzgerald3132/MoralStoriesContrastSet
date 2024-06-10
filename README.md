@@ -1,4 +1,4 @@
-# MoralStoriesContrastSet
+# Some Issues in Predictive Ethics Modeling: An Annotated Contrast Set of “Moral Stories”
 Abstract: 
 Models like the Allen Institute’s Delphi have been able to label ethical dilemmas as moral or immoral with astonishing accuracy. This paper challenges accuracy as a holistic metric for ethics modeling by identifying issues with translating moral dilemmas into text-based input. It demonstrates these issues with contrast sets that substantially reduce the performance of classifiers trained on the dataset Moral Stories. Ultimately, we obtain concrete estimates for how much specific forms of data misrepresentation harm classifier accuracy. Specifically, label-changing tweaks to a situation’s descriptive content (as small as 3-5 words) can reduce classifier accuracy to as low as 51%, almost half the initial accuracy of 99.8%. Associating situations with a misleading social norm lowers accuracy to 98.8%, while adding textual bias (i.e. an implication that a situation already fits a certain label) lowers accuracy to 77%.
 
