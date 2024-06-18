@@ -1,0 +1,194 @@
+<html>
+  <head>
+    <style>
+      body * {
+        display: block;
+        margin-bottom: 10px;
+      }
+      #lb_main, #input_main {display: none}
+      .row {
+        margin-bottom: 20px;
+      }
+      .row, label, input, select, p {
+        width: 100%;
+      }
+      #radios label, #radios input {
+        width: 10%;
+        display: inline-block;
+      }
+      h1, h2 {
+        width: 100%;
+        text-align: center;
+      }
+      #buttons {
+        width: 100%;
+        text-align: right;
+      }
+      button {
+          display: inline;
+          margin-right: 10px
+      }
+      #radios {//float: left}
+    </style>
+    <script type="text/javascript">
+        
+    </script>
+  </head>
+  <body>
+    <div class="grid">
+	    <div class="row" id="heading">
+	      <h1 id="title">Set-up for contrast set collection </h1>
+      </div>
+      <div class="row" id="instructions">
+	      <h2 id="instructions">Provide main parameters</h2>
+      </div>
+      <div class="row" id="main">
+	      <p id="label_main"></p>
+        <!--<input id="input_main" />-->
+      </div>
+      <div class="row" id="1">
+        <p id="lb1">Instructions: </p>
+        <input id="input1" />
+      </div>
+      <div class="row" id="supplementary_rows"></div>
+      <div class="row" id="2">
+        <p id="lb2">Choose the main column to be altered:</p>
+        <select name="columns" id="columns">
+          <option class="col_options" value="none">None</option>
+          <option class="col_options" value="norm">Norm</option>
+          <option class="col_options" value="situation">Situation</option>
+          <option class="col_options" value="intention">Intention</option>
+          <option class="col_options" value="action">Action</option>
+          <option class="col_options" value="consequence">Consequence</option>
+          <option class="col_options" value="norm">Label</option>
+        </select>
+      </div>
+      <div class="row" id="3">
+        <p id="lb3">Annotation subclasses (separated by semi-colons)</p>
+        <input id="input3" />
+      </div>
+      <div class="row" id="files">
+        <input type="file" id="file_input">
+      </div>
+      <div class="row" id="radios"></div>
+      <div class="row" id="buttons">
+        <button id="previous">Previous</button>
+        <button id="next">Next</button>
+        <button id="save">Save</button>
+        <button id="quit">Quit</button>
+      </div>
+      <div class="row" id="files">
+        <p id="output">Text</p>
+      </div>
+      <script type="text/javascript" style="display: none">
+          const LOWER_BOUND = 99
+
+	  let index = -1
+          let input = [""]
+          let main_column = "None"
+          let subclasses = [""]
+          let directions
+          
+          // Vars
+          const title = document.getElementById("title")
+          const instructions = document.getElementById("instructions")
+          const main_label = document.getElementById("label_main")
+          //const main_input = document.getElementById("input_main")
+          const supplementary_rows = document.getElementById("supplementary_rows")
+
+          const columns = ['norm', 'situation', 'intention', 'moral_action', 'immoral_action', 'moral_consequence', 'immoral_consequence', 'label']
+
+          const next_btn = document.getElementById("next")
+          next_btn.addEventListener('click', function () {
+              // Get next screen
+              index++
+              if (index == 0) {                  
+                  directions = document.getElementById("input1").value
+                  main_column = document.getElementById("columns").value
+                  subclasses = document.getElementById("input3").value.split(";")
+                  console.log(document.getElementById("input3").value)
+
+                  document.getElementById("lb1").style.display = "none";
+                  document.getElementById("input1").style.display = "none"
+                  document.getElementById("lb2").style.display = "none"
+                  document.getElementById("columns").style.display = "none"
+                  document.getElementById("lb3").style.display = "none"
+                  document.getElementById("input3").style.display = "none" 
+                  document.getElementById("file_input").style.display = "none"
+
+                  //main_input.style.display = "block"
+                  
+                  while (index++ < LOWER_BOUND);
+              }
+              else {
+              	  // Save previous input
+                  temp = JSON.parse(input[index - 1])
+              	  inputs = document.getElementsByTagName("input")
+                  for (let i = 0; i < columns.length; i++) {
+                      column = columns[i]
+                      if (column.toLowerCase() == main_column || column.toLowerCase() == "ID" || !(column in row)) {continue}
+                      temp[column] = document.getElementById(`${column}_input`).value
+                  }
+                  temp["ID"] = document.getElementById("subclass_selector").value + "_" + index
+                  console.log(JSON.stringify(temp))
+                  document.getElementById("output").innerHTML += JSON.stringify(temp)
+              }
+              
+              title.innerHTML = `Entry: ${index}`
+              //main_input.text = ""
+
+              row = JSON.parse(input[index])
+
+              // Write supplemental rows
+              build = `<p>${directions}:</p>`
+              for (let i = 0; i < columns.length; i++) {
+                  column = columns[i]
+                  if (column.toLowerCase() == main_column || column.toLowerCase() == "ID" || !(column in row)) {continue}
+                  build += `<label id="${column}_label" for="${column}_input" style="margin-left: 20px">${row[column]}</label>`
+                  build += `<input name=\"${column}_input\" style="margin-left: 20px" id=\"${column}_input\" />`
+              }
+              supplementary_rows.innerHTML = build
+
+              // Fill in cells with data
+              //main_input.value = row[main_column]
+              for (let i = 0; i < columns.length; i++) {
+                  column = columns[i]
+                  if (column.toLowerCase() == main_column || column.toLowerCase() == "ID" || !(column in row)) {continue}
+                  document.getElementById(`${column}_input`).value = row[column]
+              }
+
+              // Write subclass dropdown
+              build = `<select id=\"subclass_selector\">`
+              for (let i = 0; i < subclasses.length; i++) {
+                  build += `<option id="${subclasses[i]}_option" value="${subclasses[i]}">${subclasses[i]}</option>`
+              }
+              build += "</select>"
+              document.getElementById("radios").innerHTML = build
+
+              if (index == input.length - 1) {
+                  next_btn.style.display = "none"
+              }
+          })
+
+          // File I/O
+          document.getElementById('file_input').addEventListener('change', function () {
+              let reader = new FileReader();
+              reader.onload = function () {                
+                  x = reader.result
+                  input = x.split("}")
+                  console.log("Dataset length: " + input.length)
+                  for (let i = 0; i < input.length; i++) {input[i] += "}"}
+              }
+
+              reader.readAsText(this.files[0]);
+          })
+          
+          function read_file(x) {
+              input = x.split("}")
+              console.log("Dataset length: " + input.length)
+              for (let i = 0; i < input.length; i++) {input[i] += "}"}
+          } 
+
+    </script>
+  </body>
+</html>
